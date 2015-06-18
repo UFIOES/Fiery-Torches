@@ -1,0 +1,20 @@
+Manifest
+{
+	# Name of the mods.
+	Name = "FieryTorches"
+
+	# Description of the mod.
+	Description = "Makes torches burn."
+
+	# The major version number.
+	MajorVersion = 1.0
+
+	# The minor version number.
+	MinorVersion = 1
+
+	# The file path to the script that is the entry point.
+	ScriptFile = "Scripts/FieryTorches.lua"
+
+	# The script entry point class name
+	ScriptClass = "FieryTorches"
+}
