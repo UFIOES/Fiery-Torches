@@ -46,7 +46,6 @@ end
 function Fiery:OnContactStop( collision )
 	if not collision.gameobject then return end
 
-
 	local targetObj = collision.gameobject:NKGetInstance()
 
 	if targetObj then
@@ -58,7 +57,6 @@ function Fiery:OnContactStop( collision )
 		end
 
 	end
-
 
 end
 -------------------------------------------------------------------------------
