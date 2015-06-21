@@ -6,9 +6,16 @@ FirePit = CraftingStation.Subclass("FirePit")
 
 FirePit.EventRange = 5.0
 
+function FirePit:PostLoad( args )
+
+	self.contacts = {}
+
+end
+
 -------------------------------------------------------------------------------
 function FirePit:Spawn()
 	self:NKGetPhysics():NKSetContactEventsEnabled(true)
+
 	FirePit.__super.Spawn(self)
 end
 -------------------------------------------------------------------------------
@@ -22,7 +29,7 @@ function FirePit:OnContactStart( collision )
 	--collision.raiseStayEvents = true
 
 	local instance = collision.gameobject:NKGetInstance()
-	if instance and self.m_activeCrafter then
+	if instance then
 
 		self:Burn(collision, instance)
 
@@ -41,8 +48,16 @@ function FirePit:Burn( collision, instance )
 
 				if targetObj:InstanceOf(BaseCharacter) then
 
-					local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 0.0, damage = 2.0, ticksPerSecond = 2.0})
-					targetObj:ApplyBuff(newBuff)
+					table.insert(self.contacts, targetObj)
+
+					if self.m_activeCrafter then
+
+						targetObj:RemoveBuff("FireDebuff")
+
+						local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 0.0, damage = 2.5, ticksPerSecond = 2.0})
+						targetObj:ApplyBuff(newBuff)
+
+					end
 
 				end
 
@@ -62,7 +77,30 @@ function FirePit:OnContactStop( collision )
 
 		if targetObj:InstanceOf(BaseCharacter) then
 
-			targetObj:RemoveBuff("FireDebuff")
+			local n = 0
+
+			for i, target in pairs(self.contacts) do
+
+				if target == targetObj then
+
+					n = i
+
+					break
+
+				end
+
+			end
+
+			table.remove(self.contacts, n)
+
+			if self.m_activeCrafter then
+
+				targetObj:RemoveBuff("FireDebuff")
+
+				local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 2.0, damage = 2.5, ticksPerSecond = 2.0})
+				targetObj:ApplyBuff(newBuff)
+
+			end
 
 		end
 
@@ -74,11 +112,33 @@ function FirePit:OnDeactivate()
 	FirePit.__super.OnDeactivate(self)
 
 	Eternus.EventSystem:NKBroadcastEventInRadius("Event_HeatIsOff", self:NKGetPosition(), self.EventRange, self)
+
+
+	for i, target in pairs(self.contacts) do
+
+		target:RemoveBuff("FireDebuff")
+
+		local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 2.0, damage = 2.5, ticksPerSecond = 2.0})
+		target:ApplyBuff(newBuff)
+
+	end
+
 end
 
 -------------------------------------------------------------------------------
 function FirePit:OnActivate()
 	FirePit.__super.OnActivate(self)
+
+
+	for i, target in pairs(self.contacts) do
+
+		target:RemoveBuff("FireDebuff")
+
+		local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 0.0, damage = 2.5, ticksPerSecond = 2.0})
+		target:ApplyBuff(newBuff)
+
+	end
+
 end
 
 -------------------------------------------------------------------------------

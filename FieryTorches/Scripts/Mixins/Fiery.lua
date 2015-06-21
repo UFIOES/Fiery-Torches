@@ -54,6 +54,9 @@ function Fiery:OnContactStop( collision )
 
 			targetObj:RemoveBuff("FireDebuff")
 
+			local newBuff = EternusEngine.BuffManager:CreateBuff("FireDebuff", {duration = 1.5, damage = 1.5, ticksPerSecond = 2.0})
+			targetObj:ApplyBuff(newBuff)
+
 		end
 
 	end
